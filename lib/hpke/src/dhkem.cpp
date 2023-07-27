@@ -101,7 +101,7 @@ DHKEM::derive_key_pair(const bytes& ikm) const
 bytes
 DHKEM::serialize(const KEM::PublicKey& pk) const
 {
-  const auto& gpk = dynamic_cast<const Group::PublicKey&>(pk);
+  const auto& gpk = static_cast<const Group::PublicKey&>(pk);
   return group.serialize(gpk);
 }
 
@@ -114,7 +114,7 @@ DHKEM::deserialize(const bytes& enc) const
 bytes
 DHKEM::serialize_private(const KEM::PrivateKey& sk) const
 {
-  const auto& gsk = dynamic_cast<const PrivateKey&>(sk);
+  const auto& gsk = static_cast<const PrivateKey&>(sk);
   return group.serialize_private(*gsk.group_priv);
 }
 
@@ -127,7 +127,7 @@ DHKEM::deserialize_private(const bytes& skm) const
 std::pair<bytes, bytes>
 DHKEM::encap(const KEM::PublicKey& pkR) const
 {
-  const auto& gpkR = dynamic_cast<const Group::PublicKey&>(pkR);
+  const auto& gpkR = static_cast<const Group::PublicKey&>(pkR);
 
   auto skE = group.generate_key_pair();
   auto pkE = skE->public_key();
@@ -145,7 +145,7 @@ DHKEM::encap(const KEM::PublicKey& pkR) const
 bytes
 DHKEM::decap(const bytes& enc, const KEM::PrivateKey& skR) const
 {
-  const auto& gskR = dynamic_cast<const PrivateKey&>(skR);
+  const auto& gskR = static_cast<const PrivateKey&>(skR);
   auto pkR = gskR.group_priv->public_key();
   auto pkE = group.deserialize(enc);
   auto zz = group.dh(*gskR.group_priv, *pkE);
@@ -158,8 +158,8 @@ DHKEM::decap(const bytes& enc, const KEM::PrivateKey& skR) const
 std::pair<bytes, bytes>
 DHKEM::auth_encap(const KEM::PublicKey& pkR, const KEM::PrivateKey& skS) const
 {
-  const auto& gpkR = dynamic_cast<const Group::PublicKey&>(pkR);
-  const auto& gskS = dynamic_cast<const PrivateKey&>(skS);
+  const auto& gpkR = static_cast<const Group::PublicKey&>(pkR);
+  const auto& gskS = static_cast<const PrivateKey&>(skS);
 
   auto skE = group.generate_key_pair();
   auto pkE = skE->public_key();
@@ -183,8 +183,8 @@ DHKEM::auth_decap(const bytes& enc,
                   const KEM::PublicKey& pkS,
                   const KEM::PrivateKey& skR) const
 {
-  const auto& gpkS = dynamic_cast<const Group::PublicKey&>(pkS);
-  const auto& gskR = dynamic_cast<const PrivateKey&>(skR);
+  const auto& gpkS = static_cast<const Group::PublicKey&>(pkS);
+  const auto& gskR = static_cast<const PrivateKey&>(skR);
 
   auto pkE = group.deserialize(enc);
   auto pkR = gskR.group_priv->public_key();

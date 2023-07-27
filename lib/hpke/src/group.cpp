@@ -81,8 +81,8 @@ EVPGroup::generate_key_pair() const
 bytes
 EVPGroup::dh(const Group::PrivateKey& sk, const Group::PublicKey& pk) const
 {
-  const auto& rsk = dynamic_cast<const PrivateKey&>(sk);
-  const auto& rpk = dynamic_cast<const PublicKey&>(pk);
+  const auto& rsk = static_cast<const PrivateKey&>(sk);
+  const auto& rpk = static_cast<const PublicKey&>(pk);
 
   // This and the next line are acceptable because the OpenSSL
   // functions fail to mark the required EVP_PKEYs as const, even
@@ -122,7 +122,7 @@ EVPGroup::dh(const Group::PrivateKey& sk, const Group::PublicKey& pk) const
 bytes
 EVPGroup::sign(const bytes& data, const Group::PrivateKey& sk) const
 {
-  const auto& rsk = dynamic_cast<const PrivateKey&>(sk);
+  const auto& rsk = static_cast<const PrivateKey&>(sk);
 
   auto ctx = make_typed_unique(EVP_MD_CTX_create());
   if (ctx == nullptr) {
@@ -151,7 +151,7 @@ EVPGroup::verify(const bytes& data,
                  const bytes& sig,
                  const Group::PublicKey& pk) const
 {
-  const auto& rpk = dynamic_cast<const PublicKey&>(pk);
+  const auto& rpk = static_cast<const PublicKey&>(pk);
 
   auto ctx = make_typed_unique(EVP_MD_CTX_create());
   if (ctx == nullptr) {
@@ -364,7 +364,7 @@ struct ECKeyGroup : public EVPGroup
 
   bytes serialize(const Group::PublicKey& pk) const override
   {
-    const auto& rpk = dynamic_cast<const PublicKey&>(pk);
+    const auto& rpk = static_cast<const PublicKey&>(pk);
 #if defined(WITH_OPENSSL3)
     OSSL_PARAM* param = nullptr;
     if (1 != EVP_PKEY_todata(rpk.pkey.get(), EVP_PKEY_PUBLIC_KEY, &param)) {
@@ -466,7 +466,7 @@ struct ECKeyGroup : public EVPGroup
 
   bytes serialize_private(const Group::PrivateKey& sk) const override
   {
-    const auto& rsk = dynamic_cast<const PrivateKey&>(sk);
+    const auto& rsk = static_cast<const PrivateKey&>(sk);
 #if defined(WITH_OPENSSL3)
     OSSL_PARAM* param = nullptr;
     if (1 != EVP_PKEY_todata(rsk.pkey.get(), EVP_PKEY_KEYPAIR, &param)) {
@@ -603,7 +603,7 @@ struct RawKeyGroup : public EVPGroup
 
   bytes serialize(const Group::PublicKey& pk) const override
   {
-    const auto& rpk = dynamic_cast<const PublicKey&>(pk);
+    const auto& rpk = static_cast<const PublicKey&>(pk);
     auto raw = bytes(pk_size);
     auto* data_ptr = raw.data();
     auto data_len = raw.size();
@@ -627,7 +627,7 @@ struct RawKeyGroup : public EVPGroup
 
   bytes serialize_private(const Group::PrivateKey& sk) const override
   {
-    const auto& rsk = dynamic_cast<const PrivateKey&>(sk);
+    const auto& rsk = static_cast<const PrivateKey&>(sk);
     auto raw = bytes(sk_size);
     auto* data_ptr = raw.data();
     auto data_len = raw.size();

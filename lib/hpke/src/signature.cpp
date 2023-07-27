@@ -66,7 +66,7 @@ struct GroupSignature : public Signature
 
   bytes serialize(const Signature::PublicKey& pk) const override
   {
-    const auto& rpk = dynamic_cast<const Group::PublicKey&>(pk);
+    const auto& rpk = static_cast<const Group::PublicKey&>(pk);
     return group.serialize(rpk);
   }
 
@@ -78,7 +78,7 @@ struct GroupSignature : public Signature
 
   bytes serialize_private(const Signature::PrivateKey& sk) const override
   {
-    const auto& rsk = dynamic_cast<const PrivateKey&>(sk);
+    const auto& rsk = static_cast<const PrivateKey&>(sk);
     return group.serialize_private(*rsk.group_priv);
   }
 
@@ -91,7 +91,7 @@ struct GroupSignature : public Signature
 
   bytes sign(const bytes& data, const Signature::PrivateKey& sk) const override
   {
-    const auto& rsk = dynamic_cast<const PrivateKey&>(sk);
+    const auto& rsk = static_cast<const PrivateKey&>(sk);
     return group.sign(data, *rsk.group_priv);
   }
 
@@ -99,7 +99,7 @@ struct GroupSignature : public Signature
               const bytes& sig,
               const Signature::PublicKey& pk) const override
   {
-    const auto& rpk = dynamic_cast<const Group::PublicKey&>(pk);
+    const auto& rpk = static_cast<const Group::PublicKey&>(pk);
     return group.verify(data, sig, rpk);
   }
 

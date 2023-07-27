@@ -49,7 +49,7 @@ RSASignature::generate_key_pair(size_t bits)
 bytes
 RSASignature::serialize(const Signature::PublicKey& pk) const
 {
-  const auto& rpk = dynamic_cast<const PublicKey&>(pk);
+  const auto& rpk = static_cast<const PublicKey&>(pk);
   const int len = i2d_PublicKey(rpk.pkey.get(), nullptr);
   auto raw = bytes(len);
   auto* data_ptr = raw.data();
@@ -74,7 +74,7 @@ RSASignature::deserialize(const bytes& enc) const
 bytes
 RSASignature::serialize_private(const Signature::PrivateKey& sk) const
 {
-  const auto& rsk = dynamic_cast<const PrivateKey&>(sk);
+  const auto& rsk = static_cast<const PrivateKey&>(sk);
   const int len = i2d_PrivateKey(rsk.pkey.get(), nullptr);
   auto raw = bytes(len);
   auto* data_ptr = raw.data();
@@ -100,7 +100,7 @@ RSASignature::deserialize_private(const bytes& skm) const
 bytes
 RSASignature::sign(const bytes& data, const Signature::PrivateKey& sk) const
 {
-  const auto& rsk = dynamic_cast<const PrivateKey&>(sk);
+  const auto& rsk = static_cast<const PrivateKey&>(sk);
 
   auto ctx = make_typed_unique(EVP_MD_CTX_create());
   if (ctx == nullptr) {
@@ -128,7 +128,7 @@ RSASignature::verify(const bytes& data,
                      const bytes& sig,
                      const Signature::PublicKey& pk) const
 {
-  const auto& rpk = dynamic_cast<const PublicKey&>(pk);
+  const auto& rpk = static_cast<const PublicKey&>(pk);
 
   auto ctx = make_typed_unique(EVP_MD_CTX_create());
   if (ctx == nullptr) {
