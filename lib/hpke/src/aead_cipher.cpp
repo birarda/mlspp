@@ -118,9 +118,6 @@ openssl_cipher(AEAD::ID cipher)
     case AEAD::ID::AES_256_GCM:
       return EVP_aes_256_gcm();
 
-    case AEAD::ID::CHACHA20_POLY1305:
-      return EVP_chacha20_poly1305();
-
     default:
       throw std::runtime_error("Unsupported algorithm");
   }

@@ -227,30 +227,40 @@ struct Certificate::ParsedCertificate
 
   static Signature::ID public_key_algorithm(X509* x509)
   {
-    switch (EVP_PKEY_base_id(X509_get0_pubkey(x509))) {
+    auto pub_key = X509_get_pubkey(x509);
+    auto signature_id = std::optional<Signature::ID>();
+
+    switch (EVP_PKEY_base_id(pub_key)) {
       case EVP_PKEY_ED25519:
-        return Signature::ID::Ed25519;
+        signature_id = Signature::ID::Ed25519;
       case EVP_PKEY_ED448:
-        return Signature::ID::Ed448;
+        signature_id = Signature::ID::Ed448;
       case EVP_PKEY_EC: {
-        auto key_size = EVP_PKEY_bits(X509_get0_pubkey(x509));
+        auto key_size = EVP_PKEY_bits(pub_key);
         switch (key_size) {
           case 256:
-            return Signature::ID::P256_SHA256;
+            signature_id = Signature::ID::P256_SHA256;
           case 384:
-            return Signature::ID::P384_SHA384;
+            signature_id = Signature::ID::P384_SHA384;
           case 521:
-            return Signature::ID::P521_SHA512;
+            signature_id = Signature::ID::P521_SHA512;
           default:
             throw std::runtime_error("Unknown curve");
         }
       }
       case EVP_PKEY_RSA:
         // RSA public keys are not specific to an algorithm
-        return Signature::ID::RSA_SHA256;
+        signature_id = Signature::ID::RSA_SHA256;
       default:
         break;
     }
+    
+    EVP_PKEY_free(pub_key);
+
+    if (signature_id) {
+      return *signature_id;
+    }
+
     throw std::runtime_error("Unsupported public key algorithm");
   }
 

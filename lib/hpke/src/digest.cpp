@@ -143,10 +143,10 @@ Digest::hmac_for_hkdf_extract(const bytes& key, const bytes& data) const
   // However, OpenSSL 3 in FIPS mode doesn't seem to check the HMAC key size
   // constraint.
 #if !defined(WITH_OPENSSL3)
-  static const auto fips_min_hmac_key_len = 14;
-  if (FIPS_mode() != 0 && key_size < fips_min_hmac_key_len) {
-    HMAC_CTX_set_flags(ctx.get(), EVP_MD_CTX_FLAG_NON_FIPS_ALLOW);
-  }
+  // static const auto fips_min_hmac_key_len = 14;
+  // if (false && key_size < fips_min_hmac_key_len) {
+  //   HMAC_CTX_set_flags(ctx.get(), EVP_MD_CTX_FLAG_NON_FIPS_ALLOW);
+  // }
 #endif
 
   // Guard against sending nullptr to HMAC_Init_ex

@@ -5,6 +5,7 @@
 #include "common.h"
 #include "openssl_common.h"
 
+#include "openssl/bn.h"
 #include "openssl/ec.h"
 #include "openssl/evp.h"
 #include "openssl/obj_mac.h"
@@ -491,7 +492,7 @@ struct ECKeyGroup : public EVPGroup
 #endif
 
     auto out = bytes(BN_num_bytes(d));
-    if (BN_bn2bin(d, out.data()) != int(out.size())) {
+    if (BN_bn2bin(d, out.data()) != out.size()) {
       throw openssl_error();
     }
 
